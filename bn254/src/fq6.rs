@@ -1,5 +1,7 @@
 use crate::fq2::Fq2;
+use crate::params::{FROBENIUS_COEFF_FQ6_C1, FROBENIUS_COEFF_FQ6_C2};
 use core::ops::{Add, Mul, Sub, SubAssign};
+use std::ops::Neg;
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Fq6(pub(crate) [Fq2; 3]);
@@ -36,6 +38,22 @@ impl Fq6 {
         Self([c0, c1, c2])
     }
 
+    pub(crate) fn invert(self) -> Option<Self> {
+        let c0 = (self.0[1] * self.0[2]).mul_by_nonres();
+        let c0 = self.0[0].square() - c0;
+
+        let c1 = self.0[2].square().mul_by_nonres();
+        let c1 = c1 - (self.0[0] * self.0[1]);
+
+        let c2 = self.0[1].square();
+        let c2 = c2 - (self.0[0] * self.0[2]);
+
+        let tmp = ((self.0[1] * c2) + (self.0[2] * c1)).mul_by_nonres();
+        let tmp = tmp + (self.0[0] * c0);
+
+        tmp.invert().map(|t| Self([t * c0, t * c1, t * c2]))
+    }
+
     pub(crate) fn mul_by_01(&self, c0: Fq2, c1: Fq2) -> Self {
         let a_a = self.0[0] * c0;
         let b_b = self.0[1] * c1;
@@ -49,6 +67,22 @@ impl Fq6 {
     pub(crate) fn mul_by_nonres(self) -> Self {
         Self([self.0[2].mul_by_nonres(), self.0[0], self.0[1]])
     }
+
+    pub(crate) fn frobenius_map(&self) -> Self {
+        let c0 = self.0[0].frobenius_map();
+        let c1 = self.0[1].frobenius_map() * FROBENIUS_COEFF_FQ6_C1[1];
+        let c2 = self.0[2].frobenius_map() * FROBENIUS_COEFF_FQ6_C2[1];
+
+        Fq6([c0, c1, c2])
+    }
+
+    pub(crate) fn frobenius_maps(self, power: usize) -> Self {
+        let c0 = self.0[0].frobenius_maps(power);
+        let c1 = self.0[1].frobenius_maps(power) * FROBENIUS_COEFF_FQ6_C1[power % 6];
+        let c2 = self.0[2].frobenius_maps(power) * FROBENIUS_COEFF_FQ6_C2[power % 6];
+
+        Self([c0, c1, c2])
+    }
 }
 
 impl Add for Fq6 {
@@ -60,6 +94,14 @@ impl Add for Fq6 {
             self.0[1] + rhs.0[1],
             self.0[2] + rhs.0[2],
         ])
+    }
+}
+
+impl Neg for Fq6 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self([-self.0[0], -self.0[1], -self.0[2]])
     }
 }
 

@@ -1,4 +1,6 @@
 use crate::fq::Fq;
+use crate::params::FROBENIUS_COEFF_FQ2_C1;
+
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -7,6 +9,10 @@ pub(crate) struct Fq2(pub(crate) [Fq; 2]);
 impl Fq2 {
     pub(crate) const fn zero() -> Self {
         Self([Fq::zero(); 2])
+    }
+
+    fn is_zero(self) -> bool {
+        self.0[0].is_zero() && self.0[1].is_zero()
     }
 
     pub(crate) const fn one() -> Self {
@@ -23,6 +29,17 @@ impl Fq2 {
         Self([re, im])
     }
 
+    pub(crate) fn invert(self) -> Option<Self> {
+        match self.is_zero() {
+            true => None,
+            _ => {
+                let t = self.0[0].square() + self.0[1].square();
+                let t_inv = t.invert().unwrap();
+                Some(Self([t_inv * self.0[0], t_inv * -self.0[1]]))
+            }
+        }
+    }
+
     /// Multiply this element by quadratic nonresidue 9 + u.
     pub(crate) fn mul_by_nonres(self) -> Self {
         // (xi+y)(i+9) = (9x+y)i+(9y-x)
@@ -36,6 +53,21 @@ impl Fq2 {
         // (9*x + y)i
         res.0[1] += t0 + t1;
         res
+    }
+
+    fn conjugate(&self) -> Self {
+        Self([self.0[0], -self.0[1]])
+    }
+
+    pub(crate) fn frobenius_map(&self) -> Self {
+        self.conjugate()
+    }
+
+    pub(crate) fn frobenius_maps(self, power: usize) -> Self {
+        let c0 = self.0[0];
+        let c1 = self.0[1] * FROBENIUS_COEFF_FQ2_C1[power % 2];
+
+        Self([c0, c1])
     }
 }
 

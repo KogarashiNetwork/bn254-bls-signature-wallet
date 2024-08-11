@@ -8,3 +8,4 @@ mod gt;
 mod limbs;
 mod math;
 mod pairing;
+mod params;

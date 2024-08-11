@@ -1,6 +1,6 @@
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub};
 
-use crate::limbs::{add, double, mul, neg, square, sub};
+use crate::limbs::{add, double, invert, little_fermat, mul, neg, square, sub};
 
 pub(crate) const MODULUS: [u64; 4] = [
     0x3c208c16d87cfd47,
@@ -27,6 +27,10 @@ impl Fq {
         Self([0; 4])
     }
 
+    pub(crate) const fn is_zero(self) -> bool {
+        self.0[0] == 0 && self.0[1] == 0 && self.0[2] == 0 && self.0[3] == 0
+    }
+
     pub(crate) const fn one() -> Self {
         Self(R)
     }
@@ -37,6 +41,13 @@ impl Fq {
 
     pub(crate) const fn square(self) -> Self {
         Self(square(self.0, MODULUS, INV))
+    }
+
+    pub(crate) fn invert(self) -> Option<Self> {
+        match invert(self.0, little_fermat(MODULUS), R, MODULUS, INV) {
+            Some(x) => Some(Self(x)),
+            None => None,
+        }
     }
 }
 

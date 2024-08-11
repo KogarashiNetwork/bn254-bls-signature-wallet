@@ -185,3 +185,65 @@ pub(crate) const fn mont(a: [u64; 8], p: [u64; 4], inv: u64) -> [u64; 4] {
 
     [l0, l1, l2, l3]
 }
+
+#[inline(always)]
+pub fn invert(
+    a: [u64; 4],
+    little_fermat: [u64; 4],
+    identity: [u64; 4],
+    p: [u64; 4],
+    inv: u64,
+) -> Option<[u64; 4]> {
+    let zero: [u64; 4] = [0; 4];
+    if a == zero {
+        None
+    } else {
+        Some(pow(a, little_fermat, identity, p, inv))
+    }
+}
+
+pub type Bits = Vec<u8>;
+
+#[inline(always)]
+pub fn to_bits(val: [u64; 4]) -> Bits {
+    let mut index = 256;
+    let mut bits: [u8; 256] = [0; 256];
+    for limb in val {
+        for byte in limb.to_le_bytes().iter() {
+            for i in 0..8 {
+                index -= 1;
+                bits[index] = byte >> i & 1;
+            }
+        }
+    }
+    bits.to_vec()
+}
+
+#[inline(always)]
+pub(crate) fn pow(
+    a: [u64; 4],
+    b: [u64; 4],
+    mut identity: [u64; 4],
+    p: [u64; 4],
+    inv: u64,
+) -> [u64; 4] {
+    let zero: [u64; 4] = [0; 4];
+    if b == zero {
+        return identity;
+    } else if a == zero {
+        return zero;
+    }
+    let bits = to_bits(b);
+    for &bit in bits.iter() {
+        identity = square(identity, p, inv);
+        if bit == 1 {
+            identity = mul(identity, a, p, inv);
+        }
+    }
+    identity
+}
+
+#[inline(always)]
+pub(crate) const fn little_fermat(p: [u64; 4]) -> [u64; 4] {
+    sub([0; 4], [2, 0, 0, 0], p)
+}

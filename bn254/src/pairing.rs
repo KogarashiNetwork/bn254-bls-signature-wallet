@@ -2,7 +2,8 @@ use crate::fq::Fq;
 use crate::fq12::Fq12;
 use crate::fq2::Fq2;
 use crate::g1::G1Affine;
-use crate::g2::G2PairingAffine;
+use crate::g2::{G2Affine, G2PairingAffine};
+use crate::gt::Gt;
 
 // 6U+2 for in NAF form
 pub const SIX_U_PLUS_2_NAF: [i8; 65] = [
@@ -32,6 +33,11 @@ pub const XI_TO_Q_MINUS_1_OVER_2: Fq2 = Fq2([
 pub struct AteParing;
 
 impl AteParing {
+    pub fn pairing(g1: G1Affine, g2: G2Affine) -> Gt {
+        let g2 = G2PairingAffine::from(g2);
+        Self::multi_miller_loop(&[(g1, g2)]).final_exp()
+    }
+
     pub fn multi_miller_loop(pairs: &[(G1Affine, G2PairingAffine)]) -> Fq12 {
         let mut pairs = pairs
             .iter()
