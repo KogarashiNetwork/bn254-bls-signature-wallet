@@ -1,6 +1,6 @@
-use core::ops::Neg;
+use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub};
 
-use crate::limbs::neg;
+use crate::limbs::{add, double, mul, neg, square, sub};
 
 pub(crate) const MODULUS: [u64; 4] = [
     0x3c208c16d87cfd47,
@@ -16,16 +16,49 @@ pub(crate) const R: [u64; 4] = [
     0x0e0a77c19a07df2f,
 ];
 
-#[derive(Clone, Copy, Debug)]
-pub(crate) struct Fq([u64; 4]);
+/// INV = -(q^{-1} mod 2^64) mod 2^64
+pub(crate) const INV: u64 = 0x87d20782e4866389;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct Fq(pub(crate) [u64; 4]);
 
 impl Fq {
-    pub(crate) fn zero() -> Self {
+    pub(crate) const fn zero() -> Self {
         Self([0; 4])
     }
 
-    pub(crate) fn one() -> Self {
+    pub(crate) const fn one() -> Self {
         Self(R)
+    }
+
+    pub(crate) const fn double(self) -> Self {
+        Self(double(self.0, MODULUS))
+    }
+
+    pub(crate) const fn square(self) -> Self {
+        Self(square(self.0, MODULUS, INV))
+    }
+}
+
+impl Add for Fq {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(add(self.0, rhs.0, MODULUS))
+    }
+}
+
+impl AddAssign for Fq {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
+    }
+}
+
+impl Sub for Fq {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self {
+        Self(sub(self.0, rhs.0, MODULUS))
     }
 }
 
@@ -34,5 +67,19 @@ impl Neg for Fq {
 
     fn neg(self) -> Self::Output {
         Self(neg(self.0, MODULUS))
+    }
+}
+
+impl Mul<Fq> for Fq {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self {
+        Self(mul(self.0, rhs.0, MODULUS, INV))
+    }
+}
+
+impl MulAssign for Fq {
+    fn mul_assign(&mut self, rhs: Self) {
+        *self = *self * rhs;
     }
 }

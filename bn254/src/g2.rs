@@ -2,6 +2,7 @@ use crate::fq2::Fq2;
 
 use core::ops::Neg;
 
+#[derive(Clone, Copy, Debug)]
 pub(crate) struct G2Affine {
     x: Fq2,
     y: Fq2,
@@ -50,11 +51,18 @@ impl From<G2Affine> for G2Projective {
     }
 }
 
-struct PairingCoeff(Fq2, Fq2, Fq2);
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct PairingCoeff(pub(crate) Fq2, pub(crate) Fq2, pub(crate) Fq2);
 
 pub(crate) struct G2PairingAffine {
     pub coeffs: Vec<PairingCoeff>,
     is_infinity: bool,
+}
+
+impl G2PairingAffine {
+    pub fn is_identity(&self) -> bool {
+        self.is_infinity
+    }
 }
 
 impl From<G2Affine> for G2PairingAffine {
