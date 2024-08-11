@@ -5,12 +5,10 @@ use crate::fq6::Fq6;
 use crate::g1::G1Affine;
 use crate::g2::PairingCoeff;
 use crate::gt::Gt;
-use crate::params::{
-    BN_X, FROBENIUS_COEFF_FQ12_C1, FROBENIUS_COEFF_FQ6_C1, FROBENIUS_COEFF_FQ6_C2,
-};
+use crate::params::{BN_X, FROBENIUS_COEFF_FQ12_C1};
 
 #[derive(Clone, Copy, Debug)]
-pub(crate) struct Fq12([Fq6; 2]);
+pub struct Fq12([Fq6; 2]);
 
 impl Fq12 {
     pub const fn one() -> Self {
@@ -47,7 +45,7 @@ impl Fq12 {
         self.mul_by_034(c0, c1, coeffs.2)
     }
 
-    pub fn mul_by_034(self, c0: Fq2, c3: Fq2, c4: Fq2) -> Self {
+    pub(crate) fn mul_by_034(self, c0: Fq2, c3: Fq2, c4: Fq2) -> Self {
         let t0 = Fq6([
             self.0[0].0[0] * c0,
             self.0[0].0[1] * c0,
