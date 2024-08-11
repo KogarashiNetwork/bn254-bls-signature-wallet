@@ -1,3 +1,4 @@
+use crate::fq::Fq;
 use crate::fq2::Fq2;
 use crate::pairing::{SIX_U_PLUS_2_NAF, XI_TO_Q_MINUS_1_OVER_2};
 use crate::params::FROBENIUS_COEFF_FQ6_C1;
@@ -11,9 +12,47 @@ pub struct G2Affine {
     is_infinity: bool,
 }
 
+pub(crate) const G2_GENERATOR_X: Fq2 = Fq2([
+    Fq::to_mont_form([
+        0x46debd5cd992f6ed,
+        0x674322d4f75edadd,
+        0x426a00665e5c4479,
+        0x1800deef121f1e76,
+    ]),
+    Fq::to_mont_form([
+        0x97e485b7aef312c2,
+        0xf1aa493335a9e712,
+        0x7260bfb731fb5d25,
+        0x198e9393920d483a,
+    ]),
+]);
+
+pub(crate) const G2_GENERATOR_Y: Fq2 = Fq2([
+    Fq::to_mont_form([
+        0x4ce6cc0166fa7daa,
+        0xe3d1e7690c43d37b,
+        0x4aab71808dcb408f,
+        0x12c85ea5db8c6deb,
+    ]),
+    Fq::to_mont_form([
+        0x55acdadcd122975b,
+        0xbc4b313370b38ef3,
+        0xec9e99ad690c3395,
+        0x090689d0585ff075,
+    ]),
+]);
+
 impl G2Affine {
     fn is_identity(self) -> bool {
         self.is_infinity
+    }
+
+    pub const fn generator() -> Self {
+        Self {
+            x: G2_GENERATOR_X,
+            y: G2_GENERATOR_Y,
+            is_infinity: false,
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub};
 
-use crate::limbs::{add, double, invert, little_fermat, mul, neg, square, sub};
+use crate::limbs::{add, double, invert, little_fermat, mont, mul, neg, square, sub};
 
 pub(crate) const MODULUS: [u64; 4] = [
     0x3c208c16d87cfd47,
@@ -9,6 +9,7 @@ pub(crate) const MODULUS: [u64; 4] = [
     0x30644e72e131a029,
 ];
 
+/// R = 2^256 mod q
 pub(crate) const R: [u64; 4] = [
     0xd35d438dc58f0d9d,
     0x0a78eb28f5c70b3d,
@@ -48,6 +49,14 @@ impl Fq {
             Some(x) => Some(Self(x)),
             None => None,
         }
+    }
+
+    pub(crate) const fn to_mont_form(val: [u64; 4]) -> Self {
+        Self(mont(
+            [val[0], val[1], val[2], val[3], 0, 0, 0, 0],
+            MODULUS,
+            INV,
+        ))
     }
 }
 

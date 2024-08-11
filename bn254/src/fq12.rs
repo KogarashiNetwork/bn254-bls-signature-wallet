@@ -1,5 +1,6 @@
 use core::ops::{Mul, MulAssign};
 
+use crate::fq::Fq;
 use crate::fq2::Fq2;
 use crate::fq6::Fq6;
 use crate::g1::G1Affine;
@@ -7,7 +8,7 @@ use crate::g2::PairingCoeff;
 use crate::gt::Gt;
 use crate::params::{BN_X, FROBENIUS_COEFF_FQ12_C1};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Fq12([Fq6; 2]);
 
 impl Fq12 {
@@ -194,6 +195,99 @@ impl Fq12 {
                 t0
             })
             .unwrap())
+    }
+
+    pub(crate) const fn generator() -> Self {
+        Fq12([
+            Fq6([
+                Fq2([
+                    Fq([
+                        0xc556f62b2a98671d,
+                        0x23a59ac167bcf363,
+                        0x5ef208445f5f6f37,
+                        0x12adf27ccb29382a,
+                    ]),
+                    Fq([
+                        0x2e02a64acbd60549,
+                        0xd618018ea58e4add,
+                        0x14d585f1a45ba647,
+                        0x1832226987c434fc,
+                    ]),
+                ]),
+                Fq2([
+                    Fq([
+                        0x2306e4312363b991,
+                        0x465f6072d4023bf4,
+                        0xa2ff062a4a77e736,
+                        0x76ea6f18435864a,
+                    ]),
+                    Fq([
+                        0x172d1f257a4d598e,
+                        0xddf5bc7b7ffb5ac0,
+                        0xae0b22c0bbb0f602,
+                        0x1B158F3C2FAE9B18,
+                    ]),
+                ]),
+                Fq2([
+                    Fq([
+                        0x5cf9cc917da86724,
+                        0xc799dc487a0b2753,
+                        0xdf2027bf1de17a7,
+                        0x197cda6cc3e20636,
+                    ]),
+                    Fq([
+                        0xf16c96d081754cdb,
+                        0xce0394312bceeb55,
+                        0x644e4dcf1f01ff0a,
+                        0xcbea85ee0b236cc,
+                    ]),
+                ]),
+            ]),
+            Fq6([
+                Fq2([
+                    Fq([
+                        0x1bb0ce0def1b82a1,
+                        0x4c4c9fe1cadefa95,
+                        0x746d9990cb12b27e,
+                        0x13495c08e5d415c5,
+                    ]),
+                    Fq([
+                        0x9458abcb56d24998,
+                        0xb17540bd2a9e5adb,
+                        0x9a9983c82e401a9f,
+                        0x1614817a84c16291,
+                    ]),
+                ]),
+                Fq2([
+                    Fq([
+                        0x8975b68a2bab1f9c,
+                        0x2fdd826b796e0f35,
+                        0x6a90a35fa03dfaa5,
+                        0x1ffef4581607fc37,
+                    ]),
+                    Fq([
+                        0x7002907c28ebfe11,
+                        0x7b0591d3d080da67,
+                        0xde7e5aa2181f138e,
+                        0x210e437dfc43d951,
+                    ]),
+                ]),
+                Fq2([
+                    Fq([
+                        0x988ae2485b36cf53,
+                        0x5091cc0581334e54,
+                        0xda7903229312ca0f,
+                        0x2a2341538eaee95c,
+                    ]),
+                    Fq([
+                        0xd34bab373157aa84,
+                        0x3511ed44fd0d8598,
+                        0x67e42a0bc2ced972,
+                        0x2b8f1d5dfd20c55b,
+                    ]),
+                ]),
+            ]),
+        ])
     }
 }
 

@@ -3,5 +3,8 @@ name = "bn254"
 version = "0.1.0"
 edition = "2021"
 
+[dependencies]
+rand_core = { version="0.6.4", default-features = false }
+
 [dev-dependencies]
 rand_core = { version="0.6.4", default-features = false, features = ["getrandom"] }

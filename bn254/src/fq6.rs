@@ -3,7 +3,7 @@ use crate::params::{FROBENIUS_COEFF_FQ6_C1, FROBENIUS_COEFF_FQ6_C2};
 use core::ops::{Add, Mul, Sub, SubAssign};
 use std::ops::Neg;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct Fq6(pub(crate) [Fq2; 3]);
 
 impl Fq6 {
